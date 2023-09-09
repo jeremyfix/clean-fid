@@ -264,6 +264,50 @@ def fid_folder(
 
 
 """
+Computes the FID score between one dataset and a model
+data: a torch.data.Dataset
+"""
+
+
+def fid_dataset(
+    dataset,
+    G,
+    model=None,
+    model_name="inception_v3",
+    z_dim=512,
+    num_gen=50_000,
+    mode="clean",
+    num_workers=0,
+    batch_size=128,
+    device=torch.device("cuda"),
+    verbose=True,
+    custom_image_transform=None,
+    custom_fn_resize=None,
+):
+
+    # TODO: compute the reference features for the given dataset
+    ref_mu = None
+    ref_sigma = None
+
+    np_feats = get_model_features(
+        G,
+        model,
+        mode=mode,
+        z_dim=z_dim,
+        num_gen=num_gen,
+        batch_size=batch_size,
+        device=device,
+        verbose=verbose,
+        custom_image_tranform=custom_image_tranform,
+        custom_fn_resize=custom_fn_resize,
+    )
+    mu = np.mean(np_feats, axis=0)
+    sigma = np.cov(np_feats, rowvar=False)
+    fid = frechet_distance(mu, sigma, ref_mu, ref_sigma)
+    return fid
+
+
+"""
 Compute the FID stats from a generator model
 """
 
