@@ -346,7 +346,7 @@ def fid_dataset(
         batch_size=batch_size,
         device=device,
         verbose=verbose,
-        custom_image_tranform=custom_image_tranform,
+        custom_image_tranform=custom_image_transform,
         custom_fn_resize=custom_fn_resize,
     )
     mu = np.mean(np_feats, axis=0)
