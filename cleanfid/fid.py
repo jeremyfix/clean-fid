@@ -277,7 +277,6 @@ def get_dataset_features(
     mode="clean",
     custom_fn_resize=None,
     description="",
-    fdir=None,
     verbose=True,
     custom_image_tranform=None,
 ):
@@ -333,21 +332,39 @@ def fid_dataset(
     custom_fn_resize=None,
 ):
 
-    # TODO: compute the reference features for the given dataset
-    ref_mu = None
-    ref_sigma = None
+    # Build the model to extract
+    if model_name == "inception_v3":
+        feat_model = build_feature_extractor(mode, device)
+        custom_fn_resize = None
+        custom_image_tranform = None
+    else:
+        raise ValueError(f"The entered model name - {model_name} was not recognized.")
+    np_feats = get_dataset_features(
+        dataset,
+        feat_model,
+        num_workers,
+        batch_size,
+        device,
+        mode,
+        custom_fn_resize=custom_fn_resize,
+        description="Dataset features",
+        verbose=verbose,
+        custom_image_tranform=custom_image_tranform,
+    )
+    ref_mu = np.mean(np_feats, axis=0)
+    ref_sigma = np.cov(np_feats, rowvar=False)
 
     np_feats = get_model_features(
         G,
-        model,
+        feat_model,
         mode=mode,
         z_dim=z_dim,
         num_gen=num_gen,
+        custom_fn_resize=custom_fn_resize,
+        custom_image_tranform=custom_image_transform,
         batch_size=batch_size,
         device=device,
         verbose=verbose,
-        custom_image_tranform=custom_image_transform,
-        custom_fn_resize=custom_fn_resize,
     )
     mu = np.mean(np_feats, axis=0)
     sigma = np.cov(np_feats, rowvar=False)
