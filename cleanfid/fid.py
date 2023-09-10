@@ -264,6 +264,54 @@ def fid_folder(
 
 
 """
+Compute the inception features from a mappable dataset
+"""
+
+
+def get_dataset_features(
+    dataset,
+    model,
+    num_workers,
+    batch_size,
+    device=torch.device("cuda"),
+    mode="clean",
+    custom_fn_resize=None,
+    description="",
+    fdir=None,
+    verbose=True,
+    custom_image_tranform=None,
+):
+    # Wrap the dataset to ensure the images are resized to the target
+    # size
+    dataset = ResizeWrapperDataset(dataset, mode=mode)
+
+    if custom_image_tranform is not None:
+        dataset.custom_image_tranform = custom_image_tranform
+    if custom_fn_resize is not None:
+        dataset.fn_resize = custom_fn_resize
+
+    dataloader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        drop_last=False,
+        num_workers=num_workers,
+    )
+
+    # collect all inception features
+    l_feats = []
+    if verbose:
+        pbar = tqdm(dataloader, desc=description)
+    else:
+        pbar = dataloader
+
+    for batch in pbar:
+        l_feats.append(get_batch_features(batch, model, device))
+    np_feats = np.concatenate(l_feats)
+    return np_feats
+
+
+"""
 Computes the FID score between one dataset and a model
 data: a torch.data.Dataset
 """
