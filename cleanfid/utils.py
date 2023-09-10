@@ -49,9 +49,12 @@ class ResizeWrapperDataset(torch.utils.data.Dataset):
                 f"Expected the input tensor to be 3-dimensional, got {len(input_i.shape)} dimensional tensor instead"
             )
 
+        # Transpose C, H, W to H, W, C
+        input_i = input_i.permute(1, 2, 0)
         # Convert the pytorch tensor to a nd array in [0, 255]
         # The resizer is expecting a nd array in this range
         np_input_i = 255 * input_i.numpy()
+
         # fn_resize expects a np array and returns a np array
         img_resized = self.fn_resize(np_input_i)
         img_t = self.transforms(img_resized)
