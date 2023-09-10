@@ -19,7 +19,7 @@ class ResizeWrapperDataset(torch.utils.data.Dataset):
         self.custom_image_tranform = lambda x: x
 
     def __len__(self):
-        return len(self.bae_dataset)
+        return len(self.base_dataset)
 
     def __getitem__(self, i):
         elem_i = self.base_dataset[i]
