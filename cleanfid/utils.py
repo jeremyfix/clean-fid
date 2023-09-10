@@ -52,6 +52,7 @@ class ResizeWrapperDataset(torch.utils.data.Dataset):
         # Convert the pytorch tensor to a nd array in [0, 255]
         # The resizer is expecting a nd array in this range
         np_input_i = 255 * input_i.numpy()
+        # fn_resize expects a np array and returns a np array
         img_resized = self.fn_resize(np_input_i)
         img_t = self.transforms(img_resized)
 
