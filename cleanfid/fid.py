@@ -319,7 +319,6 @@ data: a torch.data.Dataset
 def fid_dataset(
     dataset,
     G,
-    model=None,
     model_name="inception_v3",
     z_dim=512,
     num_gen=50_000,
